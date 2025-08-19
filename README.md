@@ -41,25 +41,23 @@ Algumas funções chave da etapa de *feature engineering* são:
 - detect_changepoint
 - regressao_intervalos_level
 
-  **Detalhando a geração de features para detecção de vazamentos**
+**Detalhando a geração de features para detecção de vazamentos**
   
-   O principal indicador criado foi o **daily_consumption**, que representa o consumo diário estimado a partir das variações do nível de óleo, já filtrando ruídos e reabastecimentos. Essa feature de daily_consumption é fundamental para o modelo e ajuda na interpretabilidade das features geradas.
+O principal indicador criado foi o **daily_consumption**, que representa o consumo diário estimado a partir das variações do nível de óleo, já filtrando ruídos e reabastecimentos. Essa feature de daily_consumption é fundamental para o modelo e ajuda na interpretabilidade das features geradas.
   
-  Para segmentar o comportamento do consumo, utilizamos dois métodos de agrupamento:
+Para segmentar o comportamento do consumo, utilizamos dois métodos de agrupamento:
   
-  1. **Auto Group Values**: O primeiro método identifica saltos abruptos no nível de óleo (tipicamente associados a reabastecimentos) e divide a série temporal em grupos automáticos entre esses eventos. Para cada grupo, é calculada a média do consumo diário, resultando na feature **auto_group_values**. Essa abordagem captura tendências de consumo em períodos mais longos, entre reabastecimentos.
+1. **Auto Group Values**: O primeiro método identifica saltos abruptos no nível de óleo (tipicamente associados a reabastecimentos) e divide a série temporal em grupos automáticos entre esses eventos. Para cada grupo, é calculada a média do consumo diário, resultando na feature **auto_group_values**. Essa abordagem captura tendências de consumo em períodos mais longos, entre reabastecimentos.
   
-  2. **Changepoint**: O segundo método aplica detecção de pontos de mudança (changepoints) dentro de cada grupo automático, utilizando a biblioteca ruptures. Isso permite identificar alterações mais sutis ou repentinas no padrão de consumo que podem ocorrer mesmo entre dois reabastecimentos, onde o risco de vazamento pode aumentar rapidamente.
+2. **Changepoint**: O segundo método aplica detecção de pontos de mudança (changepoints) dentro de cada grupo automático, utilizando a biblioteca ruptures. Isso permite identificar alterações mais sutis ou repentinas no padrão de consumo que podem ocorrer mesmo entre dois reabastecimentos, onde o risco de vazamento pode aumentar rapidamente.
   
-  Por fim, foi criada a feature **composed_risk**, que combina a média do consumo dos grupos automáticos (**auto_group_values**) com as variações detectadas pelos changepoints. O objetivo é obter um indicador de risco mais robusto: enquanto o auto_group_values reflete variações de longo prazo, o changepoint enfatiza mudanças agudas que podem sinalizar o início ou agravamento de um vazamento entre reabastecimentos. O composed_risk será utilizado como principal métrica para detecção de vazamentos ao longo do tempo.
+Por fim, foi criada a feature **composed_risk**, que combina a média do consumo dos grupos automáticos (**auto_group_values**) com as variações detectadas pelos changepoints. O objetivo é obter um indicador de risco mais robusto: enquanto o auto_group_values reflete variações de longo prazo, o changepoint enfatiza mudanças agudas que podem sinalizar o início ou agravamento de um vazamento entre reabastecimentos. O composed_risk será utilizado como principal métrica para detecção de vazamentos ao longo do tempo.
   
-  **Features de Regressão Linear por Intervalos**
+**Features de Regressão Linear por Intervalos**
   
-  Além das features acima, também foi implementada a geração de features baseadas em regressão linear por intervalos, por meio da função `regressao_intervalos_level`. Essa função segmenta a série temporal de nível de óleo em intervalos delimitados por eventos de reabastecimento (ou saltos abruptos) e, para cada intervalo, ajusta uma regressão linear. O coeficiente angular (slope) dessa regressão representa a inclinação média do consumo naquele período, enquanto o erro da regressão indica o quanto o comportamento real se desvia de uma tendência linear simples.
+Além das features acima, também foi implementada a geração de features baseadas em regressão linear por intervalos, por meio da função `regressao_intervalos_level`. Essa função segmenta a série temporal de nível de óleo em intervalos delimitados por eventos de reabastecimento (ou saltos abruptos) e, para cada intervalo, ajusta uma regressão linear. O coeficiente angular (slope) dessa regressão representa a inclinação média do consumo naquele período, enquanto o erro da regressão indica o quanto o comportamento real se desvia de uma tendência linear simples.
   
-  Essas features de regressão têm o objetivo de replicar, de forma quantitativa, a análise visual **frequentemente realizada** por engenheiros, que comparam as inclinações dos trechos entre reabastecimentos para identificar padrões anômalos de consumo. Assim, tanto o valor da regressão quanto o erro associado podem ser utilizados (ou ao menos testados) em modelos de detecção, enriquecendo o conjunto de variáveis e permitindo capturar mudanças de comportamento que não seriam evidentes apenas pelas médias dos grupos ou pelos changepoints.
-
-
+Essas features de regressão têm o objetivo de replicar, de forma quantitativa, a análise visual **frequentemente realizada** por engenheiros, que comparam as inclinações dos trechos entre reabastecimentos para identificar padrões anômalos de consumo. Assim, tanto o valor da regressão quanto o erro associado podem ser utilizados (ou ao menos testados) em modelos de detecção, enriquecendo o conjunto de variáveis e permitindo capturar mudanças de comportamento que não seriam evidentes apenas pelas médias dos grupos ou pelos changepoints.
 
 ### 3. Resultados
 
