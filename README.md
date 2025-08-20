@@ -4,7 +4,7 @@ Repositório dedicado a exposição do projeto final do curso BI Master
 # Detecção Automatizada de Vazamento de Óleo em Geradores de Turbina a Gás Utilizando Aprendizado de Máquina
 
 #### Aluno: Davi Oliveira Francisco
-#### Orientadora: Leonardo Mendoza
+#### Orientador: Leonardo Mendoza
 
 ---
 
